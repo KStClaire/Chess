@@ -6,6 +6,7 @@ import Model.*;
 
 public class IO {
 
+	private String blah;
 	BufferedReader reader;
 	Overlord o;
 	
