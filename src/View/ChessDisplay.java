@@ -8,9 +8,12 @@ import Model.*;
 public class ChessDisplay {
 
 	public void displayBoard(){
+		
+		System.out.println("-----------------");
 		for(int i = 1; i <= Board.BOARD_HEIGHT; i++){
 			for (int k = 1; k <= Board.BOARD_WIDTH; k++){
-				System.out.print("|");
+
+				System.out.print(" ");
 				Piece p;
 				p = Overlord.getBoard().get(new Point(k, i));
 				if(p != null){
@@ -19,9 +22,12 @@ public class ChessDisplay {
 				else {
 					System.out.print('-');
 				}
+				
 			}
-			System.out.println();
+			System.out.println(" | " + i);
 		}
+		System.out.println("-----------------");
+		System.out.println(" a b c d e f g h");
 	}
 	
 }

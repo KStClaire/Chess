@@ -1,13 +1,51 @@
 package Model;
 
-public class Pawn extends Piece{
+import java.awt.Point;
 
+public class Pawn extends Piece{
+	
 	public Pawn(boolean color){
 		super(color);
+		
+	}
+
+	@Override
+	public boolean pieceMovement(Point startPosition, Point endPosition) {
+		Point difference = new Point();
+		difference.setLocation(endPosition.getX() - startPosition.getX(), endPosition.getY() - startPosition.getY());
+		
+		
+		if(this.isHasNotMoved() && this.getColor() && (difference.getX() == 0 && (difference.getY() == 1) || 
+				(difference.getY() == 2)) || (!this.isHasNotMoved() && this.getColor() && 
+				(difference.getX() == 0 && difference.getY() == 1))){
+			return true;
+		}
+		else if(this.isHasNotMoved() && !this.getColor() && (difference.getX() == 0 && (difference.getY() == -1) || 
+				(difference.getY() == -2)) || (!this.isHasNotMoved() && !this.getColor() && 
+				(difference.getX() == 0 && difference.getY() == -1))){
+			return true;
+		}
+		return false;
 	}
 	
+	/*
+	 * needs to take piece at diagonal
+	 */
 	@Override
-	boolean pieceMovement() {
+	public boolean validCapture(Point startPosition, Point endPosition){
+		Point difference = new Point();
+		difference.setLocation(endPosition.getX() - startPosition.getX(), endPosition.getY() - startPosition.getY());
+	
+		if(this.getColor() && (Math.abs(difference.getX()) == 1 && (difference.getY() == 1))){
+			return true;
+		}
+		else if(!this.getColor() && (Math.abs(difference.getX()) == 1 && (difference.getY() == -1))){
+			return true;
+		}
+		return false;
+	}
+	
+
 		/*
 		 * Can move two places if 
 		 * never moved before.
@@ -21,6 +59,5 @@ public class Pawn extends Piece{
 		 * 
 		 * Cannot move backwards
 		 */
-		return false;
-	}
+	
 }
