@@ -7,6 +7,12 @@ import Model.*;
 
 public class ChessDisplay {
 
+	Overlord o;
+	
+	public ChessDisplay(Overlord o){
+		this.o = o;
+	}
+	
 	public void displayBoard(){
 		
 		System.out.println("-----------------");
@@ -15,7 +21,7 @@ public class ChessDisplay {
 
 				System.out.print(" ");
 				Piece p;
-				p = Overlord.getBoard().get(new Point(k, i));
+				p = o.getBoard().get(new Point(k, i));
 				if(p != null){
 				System.out.print(p);
 				}

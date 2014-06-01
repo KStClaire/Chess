@@ -24,6 +24,9 @@ public abstract class Piece {
 	public boolean getColor(){
 		return isWhite;
 	}
+	public void setWhite(boolean isWhite) {
+		this.isWhite = isWhite;
+	}
 	
 	public boolean validCapture(Point startPosition, Point endPosition){
 		if(pieceMovement(startPosition,endPosition)){

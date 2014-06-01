@@ -5,10 +5,9 @@ import java.awt.Point;
 import Model.Piece;
 
 public class Behavior {
-
-//	four points
-//	piece 
-//	string
+	
+	private boolean isFirstMoveOfGame;
+	private boolean isWhitesTurn;
 	
 	private Point startPoint;
 	private Point endPoint;
@@ -66,5 +65,6 @@ public class Behavior {
 	public String toString(){
 		return str;
 	}
+	
 	
 }
