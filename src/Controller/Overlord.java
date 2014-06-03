@@ -2,12 +2,13 @@ package Controller;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.Map.Entry;
 
 import Model.*;
 import View.*;
 
 public class Overlord {
-	
+
 	private boolean isWhitesTurn = true;
 	Board b;
 	IO io;
@@ -34,6 +35,10 @@ public class Overlord {
 
 			else if (isWhitesTurn == b.get(bee.getStartPoint()).getColor()) {
 
+//				if (isKingInCheck()) {
+//					System.out.println("The King is in check");
+//				}
+
 				// Taking pieces
 				if (this.b.get(bee.getEndPoint()) != null) {
 					if (takePiece(bee.getStartPoint(), bee.getEndPoint())) {
@@ -50,6 +55,7 @@ public class Overlord {
 					} else {
 						System.err.println("Cannot move " + bee.toString());
 					}
+					
 				}
 				// moving pieces
 				else if (this.b.get(bee.getEndPoint()) == null) {
@@ -59,21 +65,65 @@ public class Overlord {
 						System.err.println("Cannot move " + bee.toString());
 					}
 				}
+				
+				if (isKingInCheck()) {
+						System.out.println("The King is in check");
+					}
+				
 				isWhitesTurn = !isWhitesTurn;
-			}
-			else{
-				if(isWhitesTurn){
+			} else {
+				if (isWhitesTurn) {
 					System.out.println("Its not Black's turn!");
-				}
-				else if (!isWhitesTurn){
+				} else if (!isWhitesTurn) {
 					System.out.println("Its not White's turn!");
 				}
 			}
-
+			
+			
 		}
+		
 	}
-	
-	
+
+	public boolean isKingInCheck() {
+		/*
+		 * 
+		 * If king is in check, he must move out of way. Rook: King is on the
+		 * same x or y path as a rook Bishop: King is diagonal from bishop
+		 * Knight: king is one L shape from knight. Queen: King is diagonal or
+		 * on the same x or y plane. Pawn: King is diagonal by one space from
+		 * king.
+		 * 
+		 * determine king's location for loop to determine opposing pieces
+		 * location in relation to king check if opposing piece can take king
+		 * piece. return true
+		 * 
+		 * save kings location and for loop through opposing piece locations
+		 * check if takePiece method returns true, if it does then so does the
+		 * check()
+		 * 
+		 * getting just opposing pieces? check if color is opposite of selected
+		 * king.
+		 * 
+		 * for( Piece p : board ){ if(takePiece(p, king) == true){ return true;
+		 * } }
+		 */
+		Point kingsLocation = null;
+		for (Entry<Point, Piece> p : b.entrySet()) {
+			if (p.getValue() instanceof King
+					&& isWhitesTurn == p.getValue().getColor()) {
+				kingsLocation = p.getKey();
+				
+			}
+		}
+		for (Entry<Point, Piece> p : b.entrySet()) {
+			if ((isWhitesTurn != p.getValue().getColor())
+					&& validTake(p.getKey(), kingsLocation)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void placePiece(Point point, Piece piece) {
 		b.put(point, piece);
 	}
@@ -92,8 +142,10 @@ public class Overlord {
 
 	public boolean takePiece(Point startLocation, Point endLocation) {
 		Piece piece = b.get(startLocation);
+		Piece ending = b.get(endLocation);
 		if (piece.validCapture(startLocation, endLocation)
-				&& checkIfPathIsClear(startLocation, endLocation)) {
+				&& checkIfPathIsClear(startLocation, endLocation)
+				&& piece.getColor() != ending.getColor()) {
 			b.remove(endLocation);
 			b.put(endLocation, b.get(startLocation));
 			b.remove(startLocation);
@@ -103,6 +155,17 @@ public class Overlord {
 		return false;
 	}
 
+	public boolean validTake(Point start, Point end){
+		Piece piece = b.get(start);
+		Piece ending = b.get(end);
+		if (ending != null && piece.validCapture(start, end)
+				&& checkIfPathIsClear(start, end) 
+				&& piece.getColor() != ending.getColor()) {
+			return true;
+		}
+		return false;
+	}
+	
 	public boolean castling(Point k1, Point k2, Point r1, Point r2) {
 		Piece k = b.get(k1);
 		Piece r = b.get(r1);
