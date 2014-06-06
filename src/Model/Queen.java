@@ -13,8 +13,9 @@ public class Queen extends Piece{
 		Point difference = new Point();
 		difference.setLocation(endPosition.getX() - startPosition.getX(), endPosition.getY() - startPosition.getY());
 		
-		if((startPosition.getX() == endPosition.getX() || startPosition.getY() == endPosition.getY()) ||
-				Math.abs(difference.getX()) == Math.abs(difference.getY())){
+		if((Math.abs(difference.getX()) == 0 && Math.abs(difference.getY()) > 0) ||
+				(Math.abs(difference.getY()) == 0 && Math.abs(difference.getX()) > 0) ||
+				(Math.abs(difference.getX()) == Math.abs(difference.getY()))){
 			return true;
 		}
 		return false;

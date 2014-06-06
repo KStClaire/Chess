@@ -1,6 +1,7 @@
 package View;
 
 import java.awt.*;
+import java.util.Map.Entry;
 
 import Controller.Overlord;
 import Model.*;
@@ -16,7 +17,7 @@ public class ChessDisplay {
 	public void displayBoard(){
 		
 		System.out.println("-----------------");
-		for(int i = 1; i <= Board.BOARD_HEIGHT; i++){
+		for(int i = Board.BOARD_HEIGHT; i > 0; i--){
 			for (int k = 1; k <= Board.BOARD_WIDTH; k++){
 
 				System.out.print(" ");
@@ -34,6 +35,22 @@ public class ChessDisplay {
 		}
 		System.out.println("-----------------");
 		System.out.println(" a b c d e f g h");
+	}
+	
+	/*
+	 * make it to where
+	 */
+	public void displayMoves(){
+		for(Entry<Point, Piece> p : o.getBoard().entrySet()){
+			if(p.getValue().getColor() == o.isWhitesTurn() && 
+					o.validMove(p.getKey()).size() > 0){
+				System.out.println(p.getKey());
+				System.out.println("has");
+				for(Point point : o.validMove(p.getKey())){
+					System.out.println(point);
+				}
+			}
+		}
 	}
 	
 }

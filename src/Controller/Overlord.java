@@ -2,6 +2,7 @@ package Controller;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map.Entry;
 
 import Model.*;
@@ -19,6 +20,7 @@ public class Overlord {
 		run();
 		ChessDisplay cd = new ChessDisplay(this);
 		cd.displayBoard();
+		cd.displayMoves();
 	}
 
 	public Overlord() {
@@ -35,9 +37,8 @@ public class Overlord {
 
 			else if (isWhitesTurn == b.get(bee.getStartPoint()).getColor()) {
 
-//				if (isKingInCheck()) {
-//					System.out.println("The King is in check");
-//				}
+//			make into methods
+				
 
 				// Taking pieces
 				if (this.b.get(bee.getEndPoint()) != null) {
@@ -66,11 +67,23 @@ public class Overlord {
 					}
 				}
 				
-				if (isKingInCheck()) {
-						System.out.println("The King is in check");
-					}
-				
 				isWhitesTurn = !isWhitesTurn;
+				
+				if(checkForCheckMate() && isWhitesTurn){
+					System.out.println("Checkmate. Black wins!");
+				}
+				else if(checkForCheckMate() && !isWhitesTurn){
+					System.out.println("Checkmate. White wins!");
+				}
+				else if(checkForCheckMate() && !isKingInCheck()){
+					System.out.println("StaleMate.");
+				}
+				else if (isKingInCheck()) {
+					System.out.println("The King is in check");
+				}
+				
+				
+				
 			} else {
 				if (isWhitesTurn) {
 					System.out.println("Its not Black's turn!");
@@ -85,28 +98,7 @@ public class Overlord {
 	}
 
 	public boolean isKingInCheck() {
-		/*
-		 * 
-		 * If king is in check, he must move out of way. Rook: King is on the
-		 * same x or y path as a rook Bishop: King is diagonal from bishop
-		 * Knight: king is one L shape from knight. Queen: King is diagonal or
-		 * on the same x or y plane. Pawn: King is diagonal by one space from
-		 * king.
-		 * 
-		 * determine king's location for loop to determine opposing pieces
-		 * location in relation to king check if opposing piece can take king
-		 * piece. return true
-		 * 
-		 * save kings location and for loop through opposing piece locations
-		 * check if takePiece method returns true, if it does then so does the
-		 * check()
-		 * 
-		 * getting just opposing pieces? check if color is opposite of selected
-		 * king.
-		 * 
-		 * for( Piece p : board ){ if(takePiece(p, king) == true){ return true;
-		 * } }
-		 */
+		
 		Point kingsLocation = null;
 		for (Entry<Point, Piece> p : b.entrySet()) {
 			if (p.getValue() instanceof King
@@ -122,6 +114,27 @@ public class Overlord {
 			}
 		}
 		return false;
+	}
+	
+	public boolean isWhitesTurn() {
+		return isWhitesTurn;
+	}
+
+	public void setWhitesTurn(boolean isWhitesTurn) {
+		this.isWhitesTurn = isWhitesTurn;
+	}
+
+	public boolean checkForCheckMate(){
+		
+		boolean checkMate = true;
+		
+		for(Entry<Point, Piece> p : b.entrySet()){
+			if(isWhitesTurn == p.getValue().getColor() && validMove(p.getKey()).size() != 0){
+				checkMate = false;
+			}
+		}
+		
+		return checkMate;
 	}
 
 	public void placePiece(Point point, Piece piece) {
@@ -166,6 +179,33 @@ public class Overlord {
 		return false;
 	}
 	
+	public ArrayList<Point> validMove(Point p){
+		ArrayList<Point> validMoves = new ArrayList<Point>();
+		Piece piece = b.get(p);
+		
+		for(int i = 1; i <= 8; i++){
+			for(int j = 1; j<= 8; j++){
+				if((piece.pieceMovement(p, new Point(i, j)) || 
+						piece.validCapture(p, new Point(i, j))) && 
+						!isKingInCheck()){
+					validMoves.add(new Point(i, j));
+				}
+			}
+		}
+		return validMoves;
+	}
+	
+//	public Overlord createTempBoard(Point p1, Point p2){
+//		Overlord o = new Overlord();
+//		o.b.putAll(this.b);
+//		o.b.remove(p2);
+//		o.b.put(p2, this.b.get(p1));
+//		o.b.remove(p1);
+//		o.isWhitesTurn = this.isWhitesTurn;
+//		return o;
+//	}
+	
+	
 	public boolean castling(Point k1, Point k2, Point r1, Point r2) {
 		Piece k = b.get(k1);
 		Piece r = b.get(r1);
@@ -195,18 +235,19 @@ public class Overlord {
 				Math.abs(endPosition.getX() - startPosition.getX()),
 				Math.abs(endPosition.getY() - startPosition.getY()));
 
-		if ((int) difference.getX() > 0 && (int) difference.getY() == 0) {
-			int largerPlace = 0;
-			if (startPosition.getX() > endPosition.getX()) {
-				largerPlace = (int) startPosition.getX();
-			} else {
-				largerPlace = (int) endPosition.getX();
-			}
-			for (int i = largerPlace - ((int) difference.getX() - 1); i < largerPlace; i++) {
-				if (b.containsKey(new Point(i, (int) startPosition.getY()))) {
+		if(difference.getX() > 0 && difference.getY() == 0)
+		{
+			int largerPlace = (int) (startPosition.getX() > endPosition.getX() 
+					? startPosition.getX() : endPosition.getX()); 
+			for(int j = (int) (largerPlace - (difference.getX() - 1)); j < largerPlace; j++)
+			{
+				if(b.containsKey(new Point(j, (int) startPosition.getY())))
+				{
 					isPathClear = false;
 				}
 			}
+		
+			
 		} else if ((int) difference.getY() > 0 && (int) difference.getX() == 0) {
 			int largerPlace = 0;
 			if (startPosition.getY() > endPosition.getY()) {
@@ -219,41 +260,28 @@ public class Overlord {
 					isPathClear = false;
 				}
 			}
-		} else if ((int) difference.getX() == (int) difference.getY()) {
-			int leftPoint = 0;
-			int rightPoint = 0;
-			int largerPlace = 0;
-			int slope = 0;
-			int y = 0;
-
-			if ((int) startPosition.getX() < (int) endPosition.getX()) {
-				leftPoint = (int) startPosition.getY();
-				rightPoint = (int) endPosition.getY();
-				largerPlace = (int) startPosition.getX();
-			} else {
-				leftPoint = (int) endPosition.getY();
-				rightPoint = (int) startPosition.getY();
-				largerPlace = (int) endPosition.getX();
-			}
-			slope = leftPoint - rightPoint;
-
-			if (slope > 0) {
-				y = leftPoint - 1;
-			} else {
-				y = leftPoint + 1;
-			}
-
-			for (int j = largerPlace - (int) difference.getX() - 1; j < largerPlace; j++) {
-				if (b.containsKey(new Point(j, y))) {
-					isPathClear = false;
-				}
-				if (slope > 0) {
-					y = y - 1;
-				} else {
-					y = y + 1;
+		} else if(difference.getX() == difference.getY()){
+				int leftPoint = (int) (startPosition.getX() < endPosition.getX() 
+						? startPosition.getY() : endPosition.getY()); 
+				int rightPoint = (int) (startPosition.getX() > endPosition.getX() 
+						? startPosition.getY() : endPosition.getY());
+				int largerPlace = (int) (startPosition.getX() > endPosition.getX() 
+						? startPosition.getX() : endPosition.getX());
+				
+				int slope = leftPoint - rightPoint;
+				
+				int y = slope > 0 ? leftPoint - 1 : leftPoint + 1;
+				
+				for(int j = (int) (largerPlace - (difference.getX() -1)); j < largerPlace; j++)
+				{				
+					if(b.containsKey(new Point(j, y)))
+					{
+						isPathClear = false;
+					}
+					y = slope > 0 ? y - 1 : y + 1;
 				}
 			}
-		}
+			
 		return isPathClear;
 	}
 
