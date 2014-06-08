@@ -16,12 +16,12 @@ public class Pawn extends Piece{
 		
 		
 		if(this.isHasNotMoved() && this.getColor() && (difference.getX() == 0 && (difference.getY() == 1) || 
-				(difference.getY() == 2)) || (!this.isHasNotMoved() && this.getColor() && 
+				(difference.getY() == 2) && (difference.getX() == 0)) || (!this.isHasNotMoved() && this.getColor() && 
 				(difference.getX() == 0 && difference.getY() == 1))){
 			return true;
 		}
 		else if(this.isHasNotMoved() && !this.getColor() && (difference.getX() == 0 && (difference.getY() == -1) || 
-				(difference.getY() == -2)) || (!this.isHasNotMoved() && !this.getColor() && 
+				(difference.getY() == -2) && (difference.getX() == 0))|| (!this.isHasNotMoved() && !this.getColor() && 
 				(difference.getX() == 0 && difference.getY() == -1))){
 			return true;
 		}

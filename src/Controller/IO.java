@@ -7,23 +7,29 @@ import Model.*;
 
 public class IO {
 
-	private static final int ADJUST = 96;
+	public static final int ADJUST = 96;
 	BufferedReader reader;
 	Overlord o;
 	ArrayList<Behavior> list;
 	
-	public IO(String file, Overlord o) throws IOException {
+
+	public IO(Overlord o){
+		this.o = o;
+		list = new ArrayList<Behavior>();
+	}
+	
+	public void getInfoFromFile(String file) throws IOException {
 		FileInputStream fis = new FileInputStream(file);
 		InputStreamReader isr = new InputStreamReader(fis);
 		reader = new BufferedReader(isr);
-		this.o = o;
-		list = new ArrayList<Behavior>();
-		getInfoFromFile();
-	}
-
-	public void getInfoFromFile() throws IOException {
 		while (reader.ready()) {
-			String[] pieces = reader.readLine().split("\\s");
+			getInfoFromString(reader.readLine());
+			
+		}
+		
+	}
+		public void getInfoFromString(String str){	
+			String[] pieces = str.split("\\s");
 
 			StringBuilder sb = new StringBuilder();
 			Piece p = null;
@@ -150,7 +156,7 @@ public class IO {
 				 System.err.println(sb);
 			 }
 		}
-	}
+	
 	
 	public ArrayList<Behavior> getBehaviors(){
 		return list;

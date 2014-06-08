@@ -13,14 +13,14 @@ public class Overlord {
 	private boolean isWhitesTurn = true;
 	Board b;
 	IO io;
-
+	ChessDisplay cd;
+	
 	public Overlord(String fileName) throws IOException {
 		this();
-		io = new IO(fileName, this);
-		run();
-		ChessDisplay cd = new ChessDisplay(this);
-		cd.displayBoard();
-		cd.displayMoves();
+		io = new IO(this);
+		io.getInfoFromFile(fileName);
+		cd  = new ChessDisplay(this);
+		getManip();
 	}
 
 	public Overlord() {
@@ -47,6 +47,7 @@ public class Overlord {
 					} else {
 						System.err.println("Cannot take " + bee.toString());
 					}
+					pawnPromotion(bee.getEndPoint());
 				}
 				// castling
 				else if (bee.getP3() != null && bee.getP4() != null) {
@@ -56,7 +57,7 @@ public class Overlord {
 					} else {
 						System.err.println("Cannot move " + bee.toString());
 					}
-					
+				
 				}
 				// moving pieces
 				else if (this.b.get(bee.getEndPoint()) == null) {
@@ -65,6 +66,8 @@ public class Overlord {
 					} else {
 						System.err.println("Cannot move " + bee.toString());
 					}
+					pawnPromotion(bee.getEndPoint());
+					
 				}
 				
 				isWhitesTurn = !isWhitesTurn;
@@ -92,9 +95,19 @@ public class Overlord {
 				}
 			}
 			
-			
+			cd.displayBoard();
 		}
 		
+	}
+	
+	public void getManip() throws IOException{
+		boolean exit = false;
+		while(!exit){
+			run();
+			this.io = new IO(this);
+			io.getInfoFromString(cd.displayMoves());
+			
+		}
 	}
 
 	public boolean isKingInCheck() {
@@ -183,12 +196,15 @@ public class Overlord {
 		ArrayList<Point> validMoves = new ArrayList<Point>();
 		Piece piece = b.get(p);
 		
+		
 		for(int i = 1; i <= 8; i++){
 			for(int j = 1; j<= 8; j++){
-				if((piece.pieceMovement(p, new Point(i, j)) || 
-						piece.validCapture(p, new Point(i, j))) && 
-						!isKingInCheck()){
+				Piece p2 = b.get(new Point(i,j));
+				if((p2 == null && piece.pieceMovement(p, new Point(i,j)) ||
+						(validTake(p, new Point(i,j)))) && 
+						!isKingInCheck() && checkIfPathIsClear(p, new Point(i,j))){
 					validMoves.add(new Point(i, j));
+				//	System.out.println(p + " " + i + " " + j );
 				}
 			}
 		}
@@ -226,6 +242,21 @@ public class Overlord {
 	public Board getBoard() {
 		return b;
 	}
+	
+	
+	public void pawnPromotion(Point p){
+		
+		if(b.get(p) instanceof Pawn && p.getY() == 8){
+			b.remove(p);
+			b.put(p, new Queen(true));
+		}
+		else if(b.get(p) instanceof Pawn && p.getY() == 1){
+			b.remove(p);
+			b.put(p, new Queen(false));
+		}
+		
+	}
+	
 
 	public boolean checkIfPathIsClear(Point startPosition, Point endPosition) {
 		boolean isPathClear = true;
